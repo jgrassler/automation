@@ -98,14 +98,35 @@ resources:
             export quickstart_repo=_quickstart_repo
             export quickstart_branch=_quickstart_branch
 
-            zypper --non-interactive install git-core
-            git clone https://github.com/suse-cloud/automation.git --branch $automation_branch /root/automation
+            . /etc/os-release; # retrieve VERSION_ID
+
+            zypper='zypper --non-interactive'
+
+            case "$VERSION_ID" in
+              "12.2")
+                $zypper ar 'http://smt-internal.opensuse.org/repo/$RCE/SUSE/Products/SLE-SERVER/12-SP1/x86_64/product/' SLE12-SP1-Pool
+                $zypper ar -f 'http://smt-internal.opensuse.org/repo/$RCE/SUSE/Updates/SLE-SERVER/12-SP1/x86_64/update/' SLES12-SP1-Updates
+               ;;
+              "12.1")
+                $zypper ar 'http://smt-internal.opensuse.org/repo/$RCE/SUSE/Products/SLE-SERVER/12-SP1/x86_64/product/' SLE12-SP1-Pool
+                $zypper ar -f 'http://smt-internal.opensuse.org/repo/$RCE/SUSE/Updates/SLE-SERVER/12-SP1/x86_64/update/' SLES12-SP1-Updates
+               ;;
+              "12")
+                $zypper ar 'http://smt-internal.opensuse.org/repo/$RCE/SUSE/Products/SLE-SERVER/12/x86_64/product/' SLES12-Pool
+                $zypper ar -f 'http://smt-internal.opensuse.org/repo/$RCE/SUSE/Updates/SLE-SERVER/12/x86_64/update/' SLES12-Updates
+               ;;
+              *)
+               ;;
+            esac
 
             # override openstack-quickstart if an alternate repo was specified
             if [ -n "$quickstart_repo" ]; then
               git clone $quickstart_repo  --branch $quickstart_branch /root/openstack-quickstart
               (cd /root/openstack-quickstart; make install)
             fi
+
+            zypper --non-interactive install git-core
+            git clone https://github.com/suse-cloud/automation.git --branch $automation_branch /root/automation
 
             sh -x /root/automation/scripts/jenkins/qa_openstack.sh &&
             touch /root/cleanvm_finished
