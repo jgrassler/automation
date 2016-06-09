@@ -128,7 +128,9 @@ resources:
             zypper --non-interactive install git-core
             git clone https://github.com/suse-cloud/automation.git --branch $automation_branch /root/automation
 
-            sh -x /root/automation/scripts/jenkins/qa_openstack.sh &&
+            zypper --non-interactive install -f kernel-default-3.12.53-60.30.1
+            $zypper remove kernel-default-base-3.12.57-60.35.1
+            #sh -x /root/automation/scripts/jenkins/qa_openstack.sh &&
             touch /root/cleanvm_finished
 
   router:
