@@ -126,7 +126,7 @@ resources:
             fi
 
             zypper --non-interactive install git-core
-            git clone https://github.com/suse-cloud/automation.git --branch $automation_branch /root/automation
+            git clone $automation_repo --branch $automation_branch /root/automation
 
             sh -x /root/automation/scripts/jenkins/qa_openstack.sh &&
             touch /root/cleanvm_finished
