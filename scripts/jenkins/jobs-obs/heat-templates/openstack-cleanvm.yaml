@@ -4,6 +4,45 @@ description: |
   This template builds the OpenStack cleanvm virtual machines for various cloud
   sources (including a TESTHEAD flag) and images.
 
+  Usage examples:
+
+    # Build from Cloud:OpenStack:Mitaka:Staging on SLE12 SP1
+    heat stack-create -f openstack-cleanvm.yaml -P key_name=myuser -P TESTHEAD=1 myuser-cleanvm
+
+    # Build from Cloud:OpenStack:Mitaka on SLE12 SP1
+    heat stack-create -f openstack-cleanvm.yaml -P key_name=myuser myuser-cleanvm
+
+    # Build from Cloud:OpenStack:Liberty on SLE12 SP1
+    heat stack-create -f openstack-cleanvm.yaml \
+      -P key_name=myuser \
+      -P cloudsource=openstackliberty \
+      myuser-cleanvm
+
+    # Build from Cloud:OpenStack:Mitaka on openSUSE Leap 42.1
+    heat stack-create -f openstack-cleanvm.yaml \
+      -P key_name=myuser \
+      -P image=openSUSE-Leap-42.1 \
+      myuser-cleanvm
+
+    # Build from Cloud:OpenStack:Mitaka on openSUSE Leap 42.1 and use a
+    # openstack-quickstart fork
+    heat stack-create -f openstack-cleanvm.yaml \
+      -P key_name=myuser \
+      -P image=openSUSE-Leap-42.1 \
+      -P quickstart_repo=https://github.com/myuser/openstack-quickstart.git \
+      -P quickstart_branch=my-quickstart-feature
+      myuser-cleanvm
+
+    # Build from Cloud:OpenStack:Mitaka on openSUSE Leap 42.1 and use a
+    # fork of SUSE-cloud/automation
+    heat stack-create -f openstack-cleanvm.yaml \
+      -P key_name=myuser \
+      -P image=openSUSE-Leap-42.1 \
+      -P automation_repo=https://github.com/myuser/automation.git \
+      -P automation_branch=my-automation-feature \
+      myuser-cleanvm
+
+
 parameters:
   TESTHEAD:
     type: string
@@ -29,8 +68,10 @@ parameters:
     description: The network to draw floating IPs from.
   image:
     type: string
-    default: SLES12-SP1-JeOS-for-OpenStack-Cloud.x86_64-1.1.1-Build24.6
-    description: The Glance image to use for the cleanvm machine
+    default: SLES12-SP1
+    description: >
+      The Glance image to use for the cleanvm machine. Use `SLES12-SP1`,
+      `SLES12-SP2` or `openSUSE-Leap-42.1` for now.
   flavor:
     type: string
     default: m1.large
@@ -57,14 +98,22 @@ resources:
   network:
     type: OS::Neutron::Net
     properties:
-      name: mynet
+      name:
+        list_join:
+          - '_'
+          - - 'heat'
+            - { get_param: 'OS::stack_name' }
 
 
   subnet:
     type: OS::Neutron::Subnet
     properties:
       cidr: 10.0.0.1/24
-      name: mysubnet
+      name:
+        list_join:
+          - '_'
+          - - 'heat'
+            - { get_param: 'OS::stack_name' }
       network:
         get_resource: network
 
@@ -158,7 +207,11 @@ resources:
     type: OS::Neutron::SecurityGroup
     properties:
       description: "Allow inbound SSH and HTTP traffic"
-      name: allow inbound SSH and ICMP from anywhere
+      name:
+        list_join:
+          - '_'
+          - - 'heat'
+            - { get_param: 'OS::stack_name' }
       rules:
         - direction: ingress
           remote_ip_prefix: 0.0.0.0/0
