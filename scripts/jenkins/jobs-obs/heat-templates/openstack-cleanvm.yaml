@@ -168,13 +168,14 @@ resources:
                ;;
             esac
 
+            zypper --non-interactive install git-core
+
             # override openstack-quickstart if an alternate repo was specified
             if [ -n "$quickstart_repo" ]; then
               git clone $quickstart_repo  --branch $quickstart_branch /root/openstack-quickstart
               (cd /root/openstack-quickstart; make install)
             fi
 
-            zypper --non-interactive install git-core
             git clone $automation_repo --branch $automation_branch /root/automation
 
             sh -x /root/automation/scripts/jenkins/qa_openstack.sh &&
