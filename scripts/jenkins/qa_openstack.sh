@@ -281,6 +281,7 @@ sed -i -e "s/with_sahara=no/with_sahara=yes/" /etc/openstackquickstartrc
 sed -i -e "s/with_designate=no/with_designate=yes/" /etc/openstackquickstartrc
 sed -i -e "s/with_gnocchi=no/with_gnocchi=yes/" /etc/openstackquickstartrc
 sed -i -e "s/node_is_compute=.*/node_is_compute=yes/" /etc/openstackquickstartrc
+sed -i -e "s/with_monasca=.*/with_monasca=yes/" /etc/openstackquickstartrc
 sed -i -e s/br0/brclean/ /etc/openstackquickstartrc
 unset http_proxy
 bash -x openstack-quickstart-demosetup
