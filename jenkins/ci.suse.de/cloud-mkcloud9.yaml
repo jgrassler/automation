@@ -2,6 +2,7 @@
     name: cloud-mkcloud9-gating
     version: 9
     previous_version: 8
+    want_trove_proposal: 0
     label: cloud-trigger
     jobs:
         - 'cloud-mkcloud{version}-gating'
@@ -14,6 +15,7 @@
     tempestoptions: --smoke
     label: openstack-mkcloud-SLE12-x86_64
     database_engine: mysql
+    want_trove_proposal: 0
     jobs:
         - 'cloud-mkcloud{version}-job-2nodes-{arch}'
         - 'cloud-mkcloud{version}-job-4nodes-linuxbridge-{arch}'
@@ -38,6 +40,7 @@
     storage_method_ha: swift
     database_engine: mysql
     want_all_ssl: 1
+    want_trove_proposal: 0
     jobs:
         - 'cloud-mkcloud{version}-job-ha-{arch}'
         - 'cloud-mkcloud{version}-job-ha-ceph-{arch}'
@@ -53,6 +56,7 @@
     arch: x86_64
     tempestoptions: --parallel
     label: openstack-mkcloud-SLE12-x86_64
+    want_trove_proposal: 0
     jobs:
          - 'cloud-mkcloud{version}-job-2nodes-tempestfull-{arch}'
          - 'cloud-mkcloud{version}-job-4nodes-linuxbridge-tempestfull-{arch}'
@@ -63,6 +67,7 @@
     arch: x86_64
     label: openstack-mkcloud-SLE12-SP2-x86_64
     tempestoptions: --smoke
+    want_trove_proposal: 0
     jobs:
         - 'cloud-mkcloud{version}-job-uefi-{arch}'
 - project:
@@ -73,6 +78,7 @@
     arch: aarch64
     label: openstack-mkcloud-SLE12-{arch}
     tempestoptions: --smoke
+    want_trove_proposal: 0
     jobs:
         - 'cloud-mkcloud{version}-job-2nodes-{arch}'
         - 'cloud-mkcloud{version}-job-4nodes-linuxbridge-{arch}'

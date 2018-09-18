@@ -385,6 +385,11 @@
           default: '1'
           description: set to 0 to not deploy aodh
 
+      - string:
+          name: want_trove_proposal
+          default:
+          description: set to 0 to not deploy trove
+
       ################################################
       # misc
 
