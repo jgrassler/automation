@@ -7,7 +7,7 @@ proposals:
     exports:
       glance:
         nfs_server: 10.162.24.1
-        export: ha-glance
+        export: /var/qa3/ha-glance
         mount_path: "/images"
         mount_options:
         - nfsvers=3
