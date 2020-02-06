@@ -6,8 +6,8 @@ proposals:
   attributes:
     exports:
       glance:
-        nfs_server: ##shared_nfs_for_glance##
-        export: ##shared_nfs_export_for_glance##
+        nfs_server: 10.162.24.1
+        export: ha-glance
         mount_path: "/images"
         mount_options:
         - nfsvers=3
