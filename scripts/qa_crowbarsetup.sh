@@ -5219,6 +5219,8 @@ function oncontroller_testpreupgrade_extended
             --parameter image=$tempest_image $heat_stack_params || \
                     complain 11 "testpreupgrade_extended: stack create failed for ${stack_name}."
 
+        # Floating IPs take a while to be reachable in virtualized environments.
+        sleep 10
         ping_stack_fips $stack_name && \
         echo "test pre-upgrade successful."
     done
