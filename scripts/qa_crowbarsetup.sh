@@ -5100,8 +5100,13 @@ function oncontroller_reduce_to_3_computes
 {
     . .openrc
     echo "Reducing cloud to 3 active compute nodes..."
-    local enable_computes=$(nova service-list | grep nova-compute | awk '{print $2}' | head -n 3)
-    local disable_computes=$(nova service-list | grep nova-compute | awk '{print $2}' | tail -n +4)
+    if iscloudver 7; then
+        local enable_computes=$(nova service-list | grep nova-compute | awk '{print $6}' | head -n 3)
+        local disable_computes=$(nova service-list | grep nova-compute | awk '{print $6}' | tail -n +4)
+    else
+        local enable_computes=$(nova service-list | grep nova-compute | awk '{print $2}' | head -n 3)
+        local disable_computes=$(nova service-list | grep nova-compute | awk '{print $2}' | tail -n +4)
+    fi
 
     echo "Nodes to enable (first 3):"
     for node in $enable_computes; do
@@ -5116,16 +5121,24 @@ function oncontroller_reduce_to_3_computes
     echo
     echo "Enabling first 3 nodes..."
 
-    for service in $enable_computes; do
-        nova service-enable $service
+    for node in $enable_computes; do
+        if iscloudver 7; then
+            nova service-enable $node nova-compute
+        else
+            nova service-enable $node
+        fi
     done
 
     echo "First 3 nodes enabled."
 
     echo "Disabling remaining nodes..."
 
-    for service in $disable_computes; do
-        nova service-disable $service
+    for node in $disable_computes; do
+        if iscloudver 7; then
+            nova service-disable $node nova-compute
+        else
+            nova service-disable $node
+        fi
     done
 
     echo "Remaining nodes disabled."
@@ -5137,9 +5150,15 @@ function oncontroller_reenable_computes
     . .openrc
 
     echo "Re-enabling disabled compute nodes..."
-    for service in $(nova service-list | grep nova-compute | grep disabled | awk '{print $2}'); do
-        nova service-enable $service
-    done
+    if iscloudver 7; then
+        for service in $(nova service-list | grep nova-compute | grep disabled | awk '{print $6}'); do
+            nova service-enable $service nova-compute
+        done
+    else
+        for service in $(nova service-list | grep nova-compute | grep disabled | awk '{print $2}'); do
+            nova service-enable $service
+        done
+    fi
 }
 
 # Use heat_stack_params to provide parameters to heat template
@@ -5148,7 +5167,11 @@ function oncontroller_testpreupgrade_extended
     echo "Running extended pre-upgrade test..."
 
     local tempest_image=$(openstack image list -f value | cut -d ' ' -f 2 | grep '^cirros-.*-tempest$' | head -n 1)
-    local nodes_enabled=$(nova service-list | grep nova-compute | grep enabled | awk '{print $2}')
+    if iscloudver 7; then
+        local nodes_enabled=$(nova service-list | grep nova-compute | grep enabled | awk '{print $6}')
+    else
+        local nodes_enabled=$(nova service-list | grep nova-compute | grep enabled | awk '{print $2}')
+    fi
     local enabled_count=$(echo $nodes_enabled | wc -w)
     if [ $enabled_count -lt 3 ]; then
         complain 11 "testpreupgrade_extended: not enough compute nodes (${enabled_count}). please ensure there are at least 3 enabled compute nodes."
@@ -5175,10 +5198,19 @@ function oncontroller_testpreupgrade_extended
 
         # enable only the target compute node and disable all other active nova-compute services
         echo "Enabling compute service $compute_node"
-        nova service-enable $compute_node
+        if iscloudver 7; then
+            nova service-enable $compute_node nova-compute
+        else
+            nova service-enable $compute_node
+        fi
+
         echo "Disabling the following nova-compute services: $nodes_disable"
         for node in $nodes_disable; do
-            nova service-disable $node
+            if iscloudver 7; then
+                nova service-disable $node nova-compute
+            else
+                nova service-disable $node
+            fi
         done
 
         openstack stack create $stack_name \
