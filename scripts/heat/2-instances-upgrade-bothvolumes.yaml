@@ -23,7 +23,11 @@ resources:
   keypair:
     type: OS::Nova::KeyPair
     properties:
-      name: testkey_bothvolumes
+      name:
+        list_join:
+          - "_"
+          - - testkey_novolumes
+            - { get_param: 'OS::stack_name' }
       public_key: { get_file: /root/.ssh/id_rsa.pub }
 
   mynetwork:
