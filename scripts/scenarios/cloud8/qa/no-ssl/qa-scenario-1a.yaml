@@ -30,11 +30,16 @@ proposals:
           @@controller2@@:
             devices:
             - ''
+          @@controller3@@:
+            devices:
+            - ''
       per_node:
         nodes:
           @@controller1@@:
             params: ''
           @@controller2@@:
+            params: ''
+          @@controller3@@:
             params: ''
     drbd:
   deployment:
@@ -42,9 +47,11 @@ proposals:
       pacemaker-cluster-member:
       - "@@controller1@@"
       - "@@controller2@@"
+      - "@@controller3@@"
       hawk-server:
       - "@@controller1@@"
       - "@@controller2@@"
+      - "@@controller3@@"
 
 
 - barclamp: database
