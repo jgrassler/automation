@@ -30,16 +30,11 @@ proposals:
           @@controller2@@:
             devices:
             - ''
-          @@controller3@@:
-            devices:
-            - ''
       per_node:
         nodes:
           @@controller1@@:
             params: ''
           @@controller2@@:
-            params: ''
-          @@controller3@@:
             params: ''
     drbd:
   deployment:
@@ -47,14 +42,13 @@ proposals:
       pacemaker-cluster-member:
       - "@@controller1@@"
       - "@@controller2@@"
-      - "@@controller3@@"
       hawk-server:
       - "@@controller1@@"
       - "@@controller2@@"
-      - "@@controller3@@"
 
 
 - barclamp: database
+  attributes:
   deployment:
     elements:
       database-server:
@@ -64,7 +58,7 @@ proposals:
     ha:
       storage:
         shared:
-          device: ##shared_nfs_for_rabbitmq##
+          device: 10.162.24.1:/var/qa3/ha-rabbitmq
           fstype: nfs
           options: nfsvers=3
     client:
@@ -92,7 +86,8 @@ proposals:
     - backend_driver: nfs
       backend_name: nfs
       nfs:
-        nfs_shares: ##cinder-storage-shares##
+        nfs_shares: 10.162.24.1:/var/qa3/cinder-storage
+        nfs_snapshot: true
   deployment:
     elements:
       cinder-controller:
@@ -103,12 +98,12 @@ proposals:
 - barclamp: neutron
   attributes:
     ml2_mechanism_drivers:
-    - ##networkingplugin##
+    - openvswitch
     ml2_type_drivers:
-    - ##networkingmode##
+    - vlan
     num_vlans: 99
-    ml2_type_drivers_default_provider_network: ##networkingmode##
-    ml2_type_drivers_default_tenant_network: ##networkingmode##
+    ml2_type_drivers_default_provider_network: vlan
+    ml2_type_drivers_default_tenant_network: vlan
   deployment:
     elements:
       neutron-server:
