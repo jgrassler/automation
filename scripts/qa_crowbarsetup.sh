@@ -4099,7 +4099,11 @@ function oncontroller_manila_generic_driver_setup()
 function oncontroller_magnum_service_setup
 {
     local service_image_name="magnum-service-image"
-    local service_image_filename=${service_image_name}.qcow2
+    if iscloudver 9plus; then
+      local service_image_filename="Fedora-Atomic-27-20180419.0.x86_64.qcow2"
+    else
+      local service_image_filename=${service_image_name}.qcow2
+    fi
     local service_image_url=$imageserver_url/$arch/other/$service_image_filename
     local local_image_path=""
     if [ -n "${localreposdir_target}" ] ; then

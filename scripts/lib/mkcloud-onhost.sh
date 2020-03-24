@@ -158,6 +158,7 @@ function onhost_cacheclouddata
                 echo "images/$a/other/magnum-service-image.qcow2"
                 echo "images/$a/other/manila-service-image.qcow2"
                 # these are the real ones, the above are just symlinks
+                echo "images/$a/other/Fedora-Atomic-27-20180419.0.x86_64.qcow2"
                 echo "images/$a/other/Fedora-Atomic-26.qcow2"
                 echo "images/$a/other/manila-service-image.x86_64-0.13.0-Build14.1.qcow2"
                 # need for the testsetup step
