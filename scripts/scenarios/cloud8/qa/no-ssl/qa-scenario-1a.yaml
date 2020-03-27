@@ -1,22 +1,6 @@
 ---
 # 1a - 7 nodes: HA (IPMI 1 x 3), KVM x 1, Swift
 proposals:
-- barclamp: nfs_client
-  name: glance
-  attributes:
-    exports:
-      glance:
-        nfs_server: 10.162.24.1
-        export: /var/qa3/ha-glance
-        mount_path: "/images"
-        mount_options:
-        - nfsvers=3
-  deployment:
-    elements:
-      nfs-client:
-      - "@@controller1@@"
-      - "@@controller2@@"
-      - "@@controller3@@"
 - barclamp: pacemaker
   name: services
   attributes:
@@ -30,11 +14,16 @@ proposals:
           @@controller2@@:
             devices:
             - ''
+          @@controller3@@:
+            devices:
+            - ''
       per_node:
         nodes:
           @@controller1@@:
             params: ''
           @@controller2@@:
+            params: ''
+          @@controller3@@:
             params: ''
     drbd:
   deployment:
@@ -42,25 +31,18 @@ proposals:
       pacemaker-cluster-member:
       - "@@controller1@@"
       - "@@controller2@@"
+      - "@@controller3@@"
       hawk-server:
       - "@@controller1@@"
       - "@@controller2@@"
-
-
+      - "@@controller3@@"
 - barclamp: database
-  attributes:
   deployment:
     elements:
       database-server:
       - cluster:services
 - barclamp: rabbitmq
   attributes:
-    ha:
-      storage:
-        shared:
-          device: 10.162.24.1:/var/qa3/ha-rabbitmq
-          fstype: nfs
-          options: nfsvers=3
     client:
       enable_notifications: true
   deployment:
@@ -73,20 +55,46 @@ proposals:
     elements:
       keystone-server:
       - cluster:services
+- barclamp: swift
+  attributes:
+    replicas: 2
+    cluster_hash: 181d283256
+    keystone_delay_auth_decision: true
+    allow_versions: true
+    middlewares:
+      crossdomain:
+        enabled: true
+      formpost:
+        enabled: true
+      staticweb:
+        enabled: true
+      tempurl:
+        enabled: true
+  deployment:
+    elements:
+      swift-dispersion: []
+      swift-proxy:
+      - cluster:services
+      swift-ring-compute:
+      - "@@controller1@@"
+      swift-storage:
+      - "@@storage-swift1@@"
+      - "@@storage-swift2@@"
 - barclamp: glance
   attributes:
-    filesystem_store_datadir: "/images"
+    default_store: swift
   deployment:
     elements:
       glance-server:
       - cluster:services
+
 - barclamp: cinder
   attributes:
     volumes:
     - backend_driver: nfs
       backend_name: nfs
       nfs:
-        nfs_shares: 10.162.24.1:/var/qa3/cinder-storage
+        nfs_shares: ##cinder-storage-shares##
         nfs_snapshot: true
   deployment:
     elements:
@@ -98,12 +106,12 @@ proposals:
 - barclamp: neutron
   attributes:
     ml2_mechanism_drivers:
-    - openvswitch
+    - ##networkingplugin##
     ml2_type_drivers:
-    - vlan
+    - ##networkingmode##
     num_vlans: 99
-    ml2_type_drivers_default_provider_network: vlan
-    ml2_type_drivers_default_tenant_network: vlan
+    ml2_type_drivers_default_provider_network: ##networkingmode##
+    ml2_type_drivers_default_tenant_network: ##networkingmode##
   deployment:
     elements:
       neutron-server:
@@ -130,7 +138,6 @@ proposals:
       nova-compute-kvm:
       - "@@compute-kvm1@@"
       - "@@compute-kvm2@@"
-      - "@@storage-swift1@@"
       nova-compute-qemu: []
       nova-compute-xen: []
 - barclamp: horizon
@@ -145,3 +152,9 @@ proposals:
     elements:
       heat-server:
       - cluster:services
+- barclamp: tempest
+  attributes:
+  deployment:
+    elements:
+      tempest:
+      - "@@controller1@@"
