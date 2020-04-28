@@ -1,6 +1,7 @@
 ---
+
 # This batch scenario will give you a Cloud 8 deployment suitable for
-# performing a non-disruptive upgrade to Cloud 9. You can apply it to a cloud
+# performing a disruptive (normal) upgrade to Cloud 9. You can apply it to a cloud
 # with Crowbar already installed (no OpenStack barclamps applied, yet).
 #
 # Before you apply this batch scenario, you will need to make a few
@@ -46,6 +47,7 @@ proposals:
       - "@@controller1@@"
       - "@@controller2@@"
       - "@@controller3@@"
+
 - barclamp: pacemaker
   name: services
   attributes:
@@ -106,7 +108,6 @@ proposals:
 
 - barclamp: glance
   attributes:
-    filesystem_store_datadir: "/images"
   deployment:
     elements:
       glance-server:
@@ -142,6 +143,7 @@ proposals:
       - cluster:services
       neutron-network:
       - cluster:services
+
 - barclamp: nova
   attributes:
     itxt_instance: ''
@@ -165,18 +167,21 @@ proposals:
       - "@@compute-kvm3@@"
       nova-compute-qemu: []
       nova-compute-xen: []
+
 - barclamp: horizon
   attributes:
   deployment:
     elements:
       horizon-server:
       - cluster:services
+
 - barclamp: heat
   attributes:
   deployment:
     elements:
       heat-server:
       - cluster:services
+
 - barclamp: tempest
   attributes:
   deployment:
