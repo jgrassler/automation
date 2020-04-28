@@ -13,9 +13,9 @@
 #    * controller1
 #    * controller2
 #    * controller3
-#    * compute-kvm1
-#    * compute-kvm2
-#    * compute-kvm3
+#    * compute1
+#    * compute2
+#    * compute3
 #
 # 2. Provide two NFS shares (one for Glance, one for Cinder) that all
 #    controllers and compute nodes have read and write acccess to. These should
@@ -161,10 +161,10 @@ proposals:
       nova-controller:
       - cluster:services
       nova-compute-hyperv: []
-      nova-compute-kvm:
-      - "@@compute-kvm1@@"
-      - "@@compute-kvm2@@"
-      - "@@compute-kvm3@@"
+      nova-compute:
+      - "@@compute1@@"
+      - "@@compute2@@"
+      - "@@compute3@@"
       nova-compute-qemu: []
       nova-compute-xen: []
 

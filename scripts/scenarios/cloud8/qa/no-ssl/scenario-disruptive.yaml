@@ -11,9 +11,9 @@
 #    * controller1
 #    * controller2
 #    * controller3
-#    * compute-kvm1
-#    * compute-kvm2
-#    * compute-kvm3
+#    * compute1
+#    * compute2
+#    * compute3
 #
 # Once you have made these alias assignments, copy this scenario file to your
 # Crowbar node's /root directory and apply it using the follow command:
@@ -57,9 +57,9 @@
       - @@controller2@@
       - @@controller3@@
       pacemaker-remote:
-      - @@compute-kvm1@@
-      - @@compute-kvm2@@
-      - @@compute-kvm3@@
+      - @@compute1@@
+      - @@compute2@@
+      - @@compute3@@
 
 - barclamp: database
   deployment:
@@ -139,7 +139,7 @@
       nova-controller:
       - cluster:services
       nova-compute-hyperv: []
-      nova-compute-kvm:
+      nova-compute:
       - remotes:services
       nova-compute-qemu: []
       nova-compute-xen: []
