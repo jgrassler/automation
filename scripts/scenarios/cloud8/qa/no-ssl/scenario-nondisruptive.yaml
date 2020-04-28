@@ -161,7 +161,7 @@ proposals:
       nova-controller:
       - cluster:services
       nova-compute-hyperv: []
-      nova-compute:
+      nova-compute-kvm:
       - "@@compute1@@"
       - "@@compute2@@"
       - "@@compute3@@"

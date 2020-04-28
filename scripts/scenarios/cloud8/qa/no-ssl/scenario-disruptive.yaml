@@ -56,10 +56,6 @@
       - @@controller1@@
       - @@controller2@@
       - @@controller3@@
-      pacemaker-remote:
-      - @@compute1@@
-      - @@compute2@@
-      - @@compute3@@
 
 - barclamp: database
   deployment:
@@ -139,8 +135,10 @@
       nova-controller:
       - cluster:services
       nova-compute-hyperv: []
-      nova-compute:
-      - remotes:services
+      nova-compute-kvm:
+      - @@compute1@@
+      - @@compute2@@
+      - @@compute3@@
       nova-compute-qemu: []
       nova-compute-xen: []
 
