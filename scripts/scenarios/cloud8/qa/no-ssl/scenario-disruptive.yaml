@@ -59,7 +59,7 @@
       pacemaker-remote:
       - @@compute-kvm1@@
       - @@compute-kvm2@@
-      - @@compute-kvm3@@
+      - @@storage-swift1@@
 
 - barclamp: database
   deployment:

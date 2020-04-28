@@ -164,7 +164,7 @@ proposals:
       nova-compute-kvm:
       - "@@compute-kvm1@@"
       - "@@compute-kvm2@@"
-      - "@@compute-kvm3@@"
+      - "@@storage-swift1@@"
       nova-compute-qemu: []
       nova-compute-xen: []
 
