@@ -1,6 +1,6 @@
 ---
 
-# This batch scenario will give you a Cloud 8 deployment suitable for
+# This batch scenario will give you a minimal, non-HA Cloud 8 deployment suitable for
 # performing a disruptive (normal) upgrade to Cloud 9. You can apply it to a cloud
 # with Crowbar already installed (no OpenStack barclamps applied, yet).
 #
@@ -9,60 +9,25 @@
 # compute nodes, respectively:
 #
 #    * controller1
-#    * controller2
-#    * controller3
 #    * compute1
-#    * compute2
-#    * compute3
+#    * compute2 (optional)
+#    * compute3 (optional)
 #
-# Once you have made these alias assignments, copy this scenario file to your
+# By default, this sceanorio only deploys one compute node (compute1).
+# Optionally, you can add additional compute nodes. To do this, uncomment the
+# compute node roles denoted as "optional, uncomment as needed" below.  Once
+# you have made these alias assignments, copy this scenario file to your
 # Crowbar node's /root directory and apply it using the follow command:
 #
-#    crowbar batch --timeout 3600 build /root/scenario-nondisruptive.yaml
+#    crowbar batch --timeout 3600 build /root/scenario-nondisruptive-minimal.yaml
 
 proposals:
-- barclamp: pacemaker
-  name: services
-  attributes:
-    stonith:
-      mode: ipmi_barclamp
-      sbd:
-        nodes:
-          @@controller1@@:
-            devices:
-            - ''
-          @@controller2@@:
-            devices:
-            - ''
-          @@controller3@@:
-            devices:
-            - ''
-      per_node:
-        nodes:
-          @@controller1@@:
-            params: ''
-          @@controller2@@:
-            params: ''
-          @@controller3@@:
-            params: ''
-    drbd:
-      enabled: false
-  deployment:
-    elements:
-      pacemaker-cluster-member:
-      - @@controller1@@
-      - @@controller2@@
-      - @@controller3@@
-      hawk-server:
-      - @@controller1@@
-      - @@controller2@@
-      - @@controller3@@
 
 - barclamp: database
   deployment:
     elements:
       database-server:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: rabbitmq
   attributes:
@@ -71,20 +36,20 @@ proposals:
   deployment:
     elements:
       rabbitmq-server:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: keystone
   deployment:
     elements:
       keystone-server:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: glance
   attributes:
   deployment:
     elements:
       glance-server:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: cinder
   attributes:
@@ -98,11 +63,9 @@ proposals:
   deployment:
     elements:
       cinder-controller:
-      - cluster:services
+      - @@controller1@@
       cinder-volume:
       - @@controller1@@
-      - @@controller2@@
-      - @@controller3@@
 
 - barclamp: neutron
   attributes:
@@ -116,9 +79,9 @@ proposals:
   deployment:
     elements:
       neutron-server:
-      - cluster:services
+      - @@controller1@@
       neutron-network:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: nova
   attributes:
@@ -132,14 +95,14 @@ proposals:
   deployment:
     elements:
       ec2-api:
-      - cluster:services
+      - @@controller1@@
       nova-controller:
-      - cluster:services
+      - @@controller1@@
       nova-compute-hyperv: []
       nova-compute-kvm:
       - @@compute1@@
-      - @@compute2@@
-      - @@compute3@@
+      #- @@compute2@@ # optional, uncomment as needed
+      #- @@compute3@@ # optional, uncomment as needed
       nova-compute-qemu: []
       nova-compute-xen: []
 
@@ -148,14 +111,14 @@ proposals:
   deployment:
     elements:
       horizon-server:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: heat
   attributes:
   deployment:
     elements:
       heat-server:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: ceilometer
   attributes:
@@ -163,13 +126,13 @@ proposals:
     elements:
       ceilometer-agent:
       - @@compute1@@
-      - @@compute2@@
-      - @@compute3@@
+      #- @@compute2@@ # optional, uncomment as needed
+      #- @@compute3@@ # optional, uncomment as needed
       ceilometer-agent-hyperv: []
       ceilometer-central:
-      - cluster:services
+      - @@controller1@@
       ceilometer-server:
-      - cluster:services
+      - @@controller1@@
 
 - barclamp: tempest
   attributes:
