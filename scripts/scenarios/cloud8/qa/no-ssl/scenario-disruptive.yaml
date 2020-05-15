@@ -79,8 +79,36 @@ proposals:
       keystone-server:
       - cluster:services
 
+- barclamp: swift
+  attributes:
+    replicas: 2
+    keystone_delay_auth_decision: true
+    allow_versions: true
+    middlewares:
+      crossdomain:
+        enabled: true
+      formpost:
+        enabled: true
+      staticweb:
+        enabled: true
+      tempurl:
+        enabled: true
+  deployment:
+    elements:
+      swift-dispersion:
+      - "@@controller1@@"
+      swift-proxy:
+      - cluster:services
+      swift-ring-compute:
+      - "@@controller1@@"
+      swift-storage:
+      - "@@compute1@@"
+      - "@@compute2@@"
+      - "@@compute3@@"
+
 - barclamp: glance
   attributes:
+    default_store: swift
   deployment:
     elements:
       glance-server:
