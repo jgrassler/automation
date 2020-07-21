@@ -59,42 +59,21 @@ proposals:
       - @@controller3@@
 
 - barclamp: database
-  attributes:
   deployment:
     elements:
       database-server:
       - cluster:services
 
 - barclamp: rabbitmq
-  wipe_attributes:
-    - tcp_listen_options.nodelay
-    - tcp_listen_options.keepalive
   attributes:
-    password: c7Wyt6pyvQOm
-    user: nova
-    vhost: nova
-    trove:
-      password: pUz4siOKYIbs
-    tcp_listen_options: {}
+    client:
+      enable_notifications: true
   deployment:
     elements:
       rabbitmq-server:
       - cluster:services
 
 - barclamp: keystone
-  attributes:
-    database_instance: default
-    rabbitmq_instance: default
-    db:
-      password: Sf8HvQUDEiix
-    service:
-      token: VGyNTegIjUrf
-    osprofiler:
-      hmac_keys:
-      - EJ94gJp4Tmq6
-    federation:
-      openidc:
-        passphrase: toqHwzsDDOoh
   deployment:
     elements:
       keystone-server:
@@ -102,15 +81,18 @@ proposals:
 
 - barclamp: swift
   attributes:
-    dispersion:
-      service_password: m9aJ5Rx9CJaA
-    container_sync:
-      key: M8imrbJRrEYG
-      key2: rAw886XWsdQe
-    cluster_hash: 14ed078703
     replicas: 2
-    keystone_instance: default
-    service_password: qDvkkKdVzl9T
+    keystone_delay_auth_decision: true
+    allow_versions: true
+    middlewares:
+      crossdomain:
+        enabled: true
+      formpost:
+        enabled: true
+      staticweb:
+        enabled: true
+      tempurl:
+        enabled: true
   deployment:
     elements:
       swift-dispersion:
@@ -126,14 +108,7 @@ proposals:
 
 - barclamp: glance
   attributes:
-    service_password: BiyePeUGq90Y
-    db:
-      password: zDexSLHibaDt
     default_store: swift
-    keystone_instance: default
-    database_instance: default
-    rabbitmq_instance: default
-    memcache_secret_key: AuJZSgK4UafJ
   deployment:
     elements:
       glance-server:
@@ -141,13 +116,6 @@ proposals:
 
 - barclamp: cinder
   attributes:
-    rabbitmq_instance: default
-    keystone_instance: default
-    glance_instance: default
-    database_instance: default
-    service_password: 0zrW0KLlve4A
-    memcache_secret_key: Sl4FFGcMiiT8
-    keymgr_fixed_key: O01ZIIvCHn4s
     volumes:
     - backend_driver: local
       backend_name: default
@@ -155,8 +123,6 @@ proposals:
         volume_name: cinder-volumes
         file_name: "/var/lib/cinder/volume.raw"
         file_size: 2000
-    db:
-      password: HnxmeS391bcX
   deployment:
     elements:
       cinder-controller:
@@ -168,40 +134,13 @@ proposals:
 
 - barclamp: neutron
   attributes:
-    service_password: IS1445OmgFkt
-    rabbitmq_instance: default
-    keystone_instance: default
-    memcache_secret_key: BClsEOJKBiiK
-    l3_ha:
-      vrrp_password: o2t0aeJiQ14F
+    ml2_mechanism_drivers:
+    - 'openvswitch'
     ml2_type_drivers:
     - 'vlan'
     num_vlans: 99
     ml2_type_drivers_default_provider_network: 'vlan'
     ml2_type_drivers_default_tenant_network: 'vlan'
-    apic:
-      opflex:
-      - pod: ''
-        nodes: []
-        peer_ip: ''
-        peer_port: 8009
-        encap: vxlan
-        vxlan:
-          encap_iface: br-int_vxlan0
-          uplink_iface: vlan.4093
-          uplink_vlan: 4093
-          remote_ip: ''
-          remote_port: 8472
-        vlan:
-          encap_iface: ''
-        integration_bridge: br-int
-        access_bridge: br-fabric
-    database_instance: default
-    db:
-      password: sNhTTmsNvH7s
-    sql:
-      max_pool_size: 60
-      max_pool_overflow: 10
   deployment:
     elements:
       neutron-server:
@@ -211,16 +150,6 @@ proposals:
 
 - barclamp: nova
   attributes:
-    service_password: IWlImC8Ca149
-    placement_service_password: fk3VwDwaeKER
-    neutron_metadata_proxy_shared_secret: vC8OvM03BrBX
-    database_instance: default
-    rabbitmq_instance: default
-    keystone_instance: default
-    glance_instance: default
-    cinder_instance: default
-    neutron_instance: default
-    memcache_secret_key: PtuTiEJV09N1
     itxt_instance: ''
     use_migration: true
     kvm:
@@ -228,41 +157,51 @@ proposals:
     metadata:
       vendordata:
         json: '{"custom-key": "custom-value"}'
-    compute_remotefs_sshkey: |
-      -----BEGIN OPENSSH PRIVATE KEY-----
-      b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-      QyNTUxOQAAACD+ALtRhH6X8bWKFHwjk329RFyvFQTbddpia9VeW7i1TQAAAJDBB/NGwQfz
-      RgAAAAtzc2gtZWQyNTUxOQAAACD+ALtRhH6X8bWKFHwjk329RFyvFQTbddpia9VeW7i1TQ
-      AAAEB7nSKb9yR4yiQxX3+XvWjqOYF5v/mLxatqPkqLTpzZvv4Au1GEfpfxtYoUfCOTfb1E
-      XK8VBNt12mJr1V5buLVNAAAADWNyb3diYXJAYWRtaW4=
-      -----END OPENSSH PRIVATE KEY-----
-    ec2-api:
-      db:
-        password: Fwph6tdCyGO8
-    db:
-      password: EHgjO2lPP8vB
-    api_db:
-      password: v9wyjuS0vgUK
-    placement_db:
-      password: o96WUwhFOFd1
   deployment:
     elements:
       ec2-api:
       - cluster:services
       nova-controller:
       - cluster:services
+      nova-compute-hyperv: []
       nova-compute-kvm:
-      - remotes:services
+      - @@compute1@@
+      - @@compute2@@
+      - @@compute3@@
       nova-compute-qemu: []
+      nova-compute-xen: []
 
 - barclamp: horizon
   attributes:
-    keystone_instance: default
-    database_instance: default
-    secret_key: 1Jbt4SLz0xEj
-    db:
-      password: OZMSllRpWc2k
   deployment:
     elements:
       horizon-server:
       - cluster:services
+
+- barclamp: heat
+  attributes:
+  deployment:
+    elements:
+      heat-server:
+      - cluster:services
+
+- barclamp: ceilometer
+  attributes:
+  deployment:
+    elements:
+      ceilometer-agent:
+      - @@compute1@@
+      - @@compute2@@
+      - @@compute3@@
+      ceilometer-agent-hyperv: []
+      ceilometer-central:
+      - cluster:services
+      ceilometer-server:
+      - cluster:services
+
+- barclamp: tempest
+  attributes:
+  deployment:
+    elements:
+      tempest:
+      - @@controller1@@
