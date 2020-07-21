@@ -92,6 +92,9 @@ proposals:
     osprofiler:
       hmac_keys:
       - EJ94gJp4Tmq6
+    federation:
+      openidc:
+        passphrase: toqHwzsDDOoh
   deployment:
     elements:
       keystone-server:
@@ -191,6 +194,8 @@ proposals:
           remote_port: 8472
         vlan:
           encap_iface: ''
+        integration_bridge: br-int
+        access_bridge: br-fabric
     database_instance: default
     db:
       password: sNhTTmsNvH7s
